@@ -1,0 +1,18 @@
+# Points Agent Gateway's custom CONTENT_AUTHZ extension at this callout.
+#
+# Replace SERVICE_DOMAIN with your Cloud Run service's domain -- for
+# example my-jev-authz-callout-abcdefg-uc.a.run.app. No scheme, no path,
+# no port: custom authz extensions always dial port 443 over TLS, which is
+# exactly what Cloud Run's default domain gives you for free (see the plan
+# doc, Section 3 and Section 7). Agent Gateway never validates this
+# certificate, so Cloud Run's Google-managed one is fine for a POC; treat
+# moving this behind a VPC-only endpoint as a production hardening step,
+# not a POC blocker (plan doc, Open questions & risks).
+#
+# Import with:
+#   gcloud beta service-extensions authz-extensions import my-custom-authz-ext \
+#     --source=deploy/custom-authz-extension.yaml --location=LOCATION
+name: my-custom-authz-ext
+service: SERVICE_DOMAIN
+failOpen: false
+timeout: 1s

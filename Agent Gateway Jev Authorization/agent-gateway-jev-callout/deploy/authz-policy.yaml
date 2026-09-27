@@ -1,0 +1,21 @@
+# Attaches the extension in custom-authz-extension.yaml to an Agent Gateway
+# as a CONTENT_AUTHZ custom authorization policy. Point this at a
+# non-production gateway first (plan doc, Section 7 and Section 8).
+#
+# Replace PROJECT_ID, LOCATION, and AGENT_GATEWAY_NAME. Attaching this
+# requires the networkservices.agentGateways.use IAM permission on the
+# gateway resource.
+#
+# Import with:
+#   gcloud network-security authz-policies import authz-with-jev \
+#     --source=deploy/authz-policy.yaml --location=LOCATION
+name: authz-with-jev
+target:
+  resources:
+    - "projects/PROJECT_ID/locations/LOCATION/agentGateways/AGENT_GATEWAY_NAME"
+policyProfile: CONTENT_AUTHZ
+action: CUSTOM
+customProvider:
+  authzExtension:
+    resources:
+      - "projects/PROJECT_ID/locations/LOCATION/authzExtensions/my-custom-authz-ext"

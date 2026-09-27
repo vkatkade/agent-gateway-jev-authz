@@ -1,0 +1,58 @@
+# Jev policy for the Agent Gateway custom CONTENT_AUTHZ extension.
+#
+# Each entry under `questions` becomes one Jev Noul (yes/no) check, run
+# against the same `state` on every gated request (see jev_authz/state.py
+# for exactly what `state` contains). Edit the instructions text below to
+# tune the policy -- you should not need to touch the Python code to change
+# what's checked. See the plan doc, Section 5 ("Jev decision engine
+# integration"), for the reasoning behind these four checks and the
+# threshold bands, and Section 9 ("Open questions & risks") for why the
+# middle band permits rather than denies.
+
+model: typesafe/jev-1.13
+timeout_seconds: 0.8      # stay comfortably under the authz-extension's own `timeout` (plan default: 1s)
+
+# A question scoring at or below approve_max is treated as "clearly false"
+# (low risk). A question at or above deny_min is "clearly true" (high risk)
+# and denies the request outright, regardless of the other questions.
+# Anything strictly between the two is the ambiguous middle band: permitted,
+# with an async alert to whoever owns this policy.
+approve_max: 0.1
+deny_min: 0.9
+
+# Optional request header carrying the agent's declared task/goal, if your
+# client sends one (used by the off_task question below). Leave blank to
+# skip this context entirely.
+task_header: x-agent-task
+
+# Deny anything whose body is bigger than this before even asking Jev --
+# keeps every call comfortably inside Jev's 32,000-token state budget.
+max_body_bytes: 200000
+
+questions:
+  off_task:
+    instructions: >-
+      `request` describes a call made through Agent Gateway. It is off task
+      if `task` is present and the call clearly serves a different goal
+      than `task` describes. If `task` is absent, treat this as false --
+      there is nothing to be off task from.
+
+  could_destroy:
+    instructions: >-
+      `request` is an irreversible or destructive operation -- for example
+      a delete, a force-push, a drop, an overwrite, or anything else that
+      cannot be undone by a normal follow-up call.
+
+  untrusted_input:
+    instructions: >-
+      `request` acts on content that most likely originated outside the
+      caller's own trusted input -- for example the fetched contents of a
+      URL, a file the caller does not own, or the output of an earlier,
+      untrusted tool call embedded in this one.
+
+  ask_first:
+    instructions: >-
+      This class of action would normally need a human's sign-off before
+      running, regardless of how safe this specific call looks -- for
+      example anything touching billing, production configuration, or
+      credentials.

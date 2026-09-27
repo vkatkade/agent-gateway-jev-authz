@@ -1,0 +1,13 @@
+# Pre-built envoy.service.ext_proc.v3 protobuf/gRPC stubs from PyPI -- an
+# off-the-shelf substitute for hand-generating them with `buf` from
+# envoyproxy/envoy, which is what GoogleCloudPlatform/service-extensions'
+# own build does (see extproc/README-VENDORED.md). Let this pull in
+# whichever grpcio/protobuf versions it actually needs -- don't pin those
+# two separately, or pip's resolver will fight itself.
+xds-protos==1.84.0
+
+requests>=2.31,<3
+PyYAML>=6.0,<7
+
+# Testing only.
+pytest>=8.0,<9

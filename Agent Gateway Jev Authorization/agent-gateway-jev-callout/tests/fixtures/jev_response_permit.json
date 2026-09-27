@@ -1,0 +1,10 @@
+{
+  "model": "typesafe/jev-1.13",
+  "answers": {
+    "off_task": {"type": "noul", "noul": 0.02},
+    "could_destroy": {"type": "noul", "noul": 0.01},
+    "untrusted_input": {"type": "noul", "noul": 0.03},
+    "ask_first": {"type": "noul", "noul": 0.05}
+  },
+  "usage": {"input_tokens": 210, "output_tokens": 0, "cost": 0.000031}
+}
